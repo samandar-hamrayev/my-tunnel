@@ -1,17 +1,26 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*.egg-info/
+build/
+dist/
 
-# Env
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Environments
 .env
 .venv/
 venv/
 
-# VSCode
+# Editors
 .vscode/
 .idea/
+.DS_Store
 
 # Logs
 *.log
