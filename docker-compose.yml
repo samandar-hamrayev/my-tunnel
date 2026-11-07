@@ -1,0 +1,28 @@
+# Relay server. Put a TLS-terminating reverse proxy (Caddy, Nginx, Traefik) in front
+# of it for anything beyond local experiments.
+services:
+  relay:
+    build: .
+    image: mytunnel-relay:local
+    restart: unless-stopped
+    environment:
+      MYTUNNEL_TOKENS: ${MYTUNNEL_TOKENS:?set MYTUNNEL_TOKENS in .env}
+      MYTUNNEL_DOMAIN: ${MYTUNNEL_DOMAIN:-}
+      MYTUNNEL_PUBLIC_URL: ${MYTUNNEL_PUBLIC_URL:-}
+      MYTUNNEL_REQUEST_TIMEOUT: ${MYTUNNEL_REQUEST_TIMEOUT:-30}
+      MYTUNNEL_MAX_BODY_BYTES: ${MYTUNNEL_MAX_BODY_BYTES:-10485760}
+      MYTUNNEL_LOG_LEVEL: ${MYTUNNEL_LOG_LEVEL:-info}
+    ports:
+      - "${MYTUNNEL_HOST_PORT:-8080}:8080"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+  # Optional demo upstream: `docker compose --profile demo up`, then
+  # `mytunnel http 9000 --token ...` exposes it through the relay.
+  demo:
+    profiles: [demo]
+    image: traefik/whoami:v1.10
+    command: ["--port", "9000"]
+    ports:
+      - "127.0.0.1:${DEMO_HOST_PORT:-9000}:9000"
